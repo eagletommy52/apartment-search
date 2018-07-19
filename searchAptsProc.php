@@ -12,6 +12,18 @@ $maxRent = $_GET['maxRent'];
 $minRent = $_GET['minRent'];
 $orderBy = $_GET['orderBy'];
 $ascDesc = $_GET['ascDesc'];
+$rowsPerPg = $_GET['rowsPerPg'];
+
+// ##**##** NPFL CODE BLOCK 1 START **##**##
+
+$currentPage = $_SERVER["PHP_SELF"];
+$pageNum = 0;
+if(isset($_GET['pageNum'])) {
+  $pageNum = $_GET['pageNum'];
+}
+$startRow = $pageNum * $rowsPerPg;
+
+// ##**##** NPFL CODE BLOCK 1 END **##**##
 
 $query = "SELECT * from apartments, buildings, neighborhoods 
 WHERE apartments.bldgID = buildings.IDbldg 
@@ -33,7 +45,14 @@ if($_GET['search'] != "") {
 }
 $query .= " AND rent BETWEEN '$minRent' AND '$maxRent' ORDER BY $orderBy $ascDesc";
 
-$result = mysqli_query($conn, $query);  
+// $result = mysqli_query($conn, $query);  
+// ##**##** NPFL CODE BLOCK 2 START **##**##
+
+$query_limit = sprintf("%s LIMIT %d, %d", $query, $startRow, $maxRow);
+$result = mysqli_query($conn, $query) or die(mysqli_error);
+
+// ##**##** NPFL CODE BLOCK 2 END **##**##
+
 $numResults = mysqli_num_rows($result);
 ?>
 
