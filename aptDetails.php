@@ -10,6 +10,7 @@ $imageRow = mysqli_fetch_array($imageResult);
 $row_cnt = $imageResult->num_rows;
 echo mysqli_error($conn);
 ?> 
+<!--Start of HTML Doc-->
 <!DOCTYPE html>
 <html>
 <head>
