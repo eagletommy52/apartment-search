@@ -48,9 +48,41 @@ $query .= " AND rent BETWEEN '$minRent' AND '$maxRent' ORDER BY $orderBy $ascDes
 // $result = mysqli_query($conn, $query);  
 // ##**##** NPFL CODE BLOCK 2 START **##**##
 
-$query_limit = sprintf("%s LIMIT %d, %d", $query, $startRow, $maxRow);
-$result = mysqli_query($conn, $query) or die(mysqli_error);
+$query_limit = sprintf("%s LIMIT %d, %d", $query, $startRow, $rowsPerPg);
+$result = mysqli_query($conn, $query_limit) or die(mysqli_error);
 
+if(isset($_GET['totalRows'])) { // true only if not on first page
+  $totalRows = $_GET['totalRows'];
+} else {
+  $all = mysqli_query($conn, $query);
+  $totalRows = mysqli_num_rows($all);
+}
+//for 17 records with 5 per page, we need 4 total pages: 
+// ceil = round up, so ceil(17/5) = 4 - 1 = 3, but first page is zero, so totalPages=3 is really 4
+$totalPages = ceil($totalRows/$rowsPerPg)-1;  
+
+$queryString = "";
+if (!empty($_SERVER['QUERY_STRING'])) { // if URL has vars
+  // explode querystring into $params array using & as delimiter
+  $params = explode("&", $_SERVER['QUERY_STRING']);
+  $newParams = array(); // make a new empty array
+  // loop through the array made (exploded) from querystring vars
+  foreach ($params as $param) {  
+      // stristr() method finds first occurance of substring
+      // if the array element string is not pageNum or totalRows
+      // so the if statement code is running only on the form variables 
+    if (stristr($param, "pageNum") == false && 
+        stristr($param, "totalRows") == false) {
+        // add that element to the new array
+      array_push($newParams, $param); // these are the form variables
+    }
+  }
+  if (count($newParams) != 0) { // if at least one item got added to array, then there must have been a querystring
+      // reassemble the queryt
+    $queryString = "&" . htmlentities(implode("&", $newParams));
+  }
+}
+$queryString = sprintf("&totalRows=%d%s", $totalRows, $queryString);
 // ##**##** NPFL CODE BLOCK 2 END **##**##
 
 $numResults = mysqli_num_rows($result);
@@ -75,6 +107,55 @@ $numResults = mysqli_num_rows($result);
             <h1 align="center">Lofty Heights Apartments - <?php echo $numResults; ?> Results Found</h1>
             </td>
         </tr>
+
+<tr>
+<td colspan="14">
+  <!-- THIRD and FINAL NPFL CODE BLOCK contains HTML & PHP mix -->
+			<!-- NPFL CODE BLOCK 3 of 3 START -->
+
+                  <a href="searchApts.php">New Search</a>
+
+&nbsp; &nbsp; &nbsp; &nbsp; | 
+&nbsp; &nbsp; &nbsp;  &nbsp;  &nbsp;
+    
+<!-- show the results range: "Results X-Z of Z" -->
+<!-- X = $startRow + 1 (+1 cuz $startRow is by index, starting w 0) -->
+<strong>Results <?php echo ($startRow + 1); ?> - 
+<!-- min() returns smaller of 2 values, which is either the last item
+in the current result range or the last result: 
+$startRow + $rowsPerPg = current range: 11-20 ($rowsPerPg = )
+Results 11-20 of 24 or Results 21-24 of 24 -->
+  <?php echo min($startRow + $rowsPerPg, $totalRows); ?> 
+  of <?php echo $totalRows; ?></strong>  
+
+&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; 
+
+<!-- The Next link carries all the POST vars, turning them into GET  -->
+<?php // Show if not last page
+    if($pageNum < $totalPages) { ?>
+      <a href="<?php printf("%s?pageNum=%d%s", $currentPage, min($totalPages, $pageNum + 1), $queryString); ?>">Next</a> &nbsp; | &nbsp; 
+<?php } // Show if not last page ?>
+
+ <?php 
+        if($pageNum > 0) { // Show if not first page ?>
+          <a href="<?php printf("%s?pageNum=%d%s", $currentPage, max(0, $pageNum - 1), $queryString); ?>">Previous</a> &nbsp;&nbsp;| &nbsp;&nbsp;
+<?php } // Show if not first page ?>
+
+ <?php
+if($pageNum > 0) { // Show if not first page ?>
+          <a href="<?php printf("%s?pageNum=%d%s", $currentPage, 0, $queryString); ?>">First &nbsp;&nbsp;| &nbsp;&nbsp;</a>
+<?php } // Show if not first page ?>
+
+<!-- The Last link carries all the POST vars, turning them into GET  -->
+  <?php
+ if($pageNum < $totalPages) { // Show if not last page ?>
+           <a href="<?php printf("%s?pageNum=%d%s", $currentPage, $totalPages, $queryString); ?>">Last</a>
+   <?php } // Show if not last page ?>    
+
+<!-- ######  END NPFL CODE BLOCK 3 OF 3 -- DONE!! ########   -->
+</td>
+</tr>
+
         <?php 
         if ($numResults == 0) {
           echo '<tr><td colspan="14">Try your search again <br><br> Redirecting... <br>
