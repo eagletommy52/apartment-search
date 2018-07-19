@@ -33,7 +33,7 @@ if($_GET['search'] != "") {
 }
 $query .= " AND rent BETWEEN '$minRent' AND '$maxRent' ORDER BY $orderBy $ascDesc";
 
-// This will be where the pagination stuff goes
+// This will be where the pagination stuff goes to set items per page per searchApt.php
 
 $result = mysqli_query($conn, $query);  
 $numResults = mysqli_num_rows($result);
