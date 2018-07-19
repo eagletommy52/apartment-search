@@ -45,7 +45,6 @@ if($_GET['search'] != "") {
 }
 $query .= " AND rent BETWEEN '$minRent' AND '$maxRent' ORDER BY $orderBy $ascDesc";
 
-<<<<<<< HEAD
 // $result = mysqli_query($conn, $query);  
 // ##**##** NPFL CODE BLOCK 2 START **##**##
 
@@ -86,11 +85,6 @@ if (!empty($_SERVER['QUERY_STRING'])) { // if URL has vars
 $queryString = sprintf("&totalRows=%d%s", $totalRows, $queryString);
 // ##**##** NPFL CODE BLOCK 2 END **##**##
 
-=======
-// This will be where the pagination stuff goes to set items per page per searchApt.php
-
-$result = mysqli_query($conn, $query);  
->>>>>>> pagination
 $numResults = mysqli_num_rows($result);
 ?>
 
