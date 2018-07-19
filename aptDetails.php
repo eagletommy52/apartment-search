@@ -1,3 +1,4 @@
+<!-- Page to show details on specific apartments, accessed from a link on the search results page -->
 <?php 
 require_once("conn/connApts.php"); 
 $IDapt = $_GET['IDapt'];
