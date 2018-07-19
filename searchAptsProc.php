@@ -33,6 +33,8 @@ if($_GET['search'] != "") {
 }
 $query .= " AND rent BETWEEN '$minRent' AND '$maxRent' ORDER BY $orderBy $ascDesc";
 
+// This will be where the pagination stuff goes
+
 $result = mysqli_query($conn, $query);  
 $numResults = mysqli_num_rows($result);
 ?>
@@ -141,3 +143,5 @@ $numResults = mysqli_num_rows($result);
     </script>
 </body>
 </html>
+
+<!-- End of file -->
